@@ -16,15 +16,16 @@
         <button id="create-room">Create new room</button>
     </div>
     <div id="enter-birthday" style="display: none;">
-        <button id="home">Home</button>
+        <button class="home">Home</button>
         <h2>Enter Your Birthday</h2>
         <input type="date" name="birthday" id="birthday">
         <button id="submit-birthday">Submit</button>
     </div>
     <div id="results" style="display: none;">
         <h2>Results</h2>
-        <button id="home">Home</button>
+        <button class="home">Home</button>
         <p id="room-id"></p>
+        <button id="delete">Delete Room</button>
         <div id="birthdays"></div>
     </div>
     
@@ -54,9 +55,15 @@
 
             // If we already have a room, show the results
             if (roomId) {
+                selectRoom(roomId) // Ensure the room id is displayed
                 showPage('results')
                 getBirthdays()
             }
+
+            // Every second, get the latest results
+            setInterval(() => {
+                getBirthdays()
+            }, 1000)
         }
         setup()
 
@@ -121,17 +128,46 @@
         })
 
         // Handle when the user clicks the home button
-        document.querySelector('#home').addEventListener('click', () => {
+        document.querySelectorAll('.home').forEach((e) => e.addEventListener('click', () => {
             // Leave the current room
             localStorage.removeItem('room')
 
+            // Loose ownership of the room
+            localStorage.removeItem('owned')
+
             showPage('room-selection')
+        }))
+
+        // Handle when the user clicks the delete button
+        document.querySelector('#delete').addEventListener('click', () => {
+            deleteRoom()
         })
 
-        // Every second, get the latest results
-        setInterval(() => {
-            getBirthdays()
-        }, 1000)
+        async function deleteRoom(){
+            if(!roomId) return
+
+            // Check the room I'm on is mine
+            if(!localStorage.getItem('owned') || localStorage.getItem('owned') !== roomId) return
+
+            const { error } = await supabaseClient.from('birthdays').delete().eq('room', roomId)
+
+            if (error) {
+                console.error('Error deleting data:', error.message)
+                return
+            }
+
+            console.log('Data deleted successfully')
+
+            // Remove the room from local storage
+            localStorage.removeItem('room')
+            roomId = null
+
+            // Remove room ownership from local storage
+            localStorage.removeItem('owned')
+
+            // Show the room selection page
+            showPage('room-selection')
+        }
 
         async function getBirthdays() {
 
@@ -144,8 +180,6 @@
                 console.error('Error getting data:', error.message)
                 return
             }
-
-            console.log('Data found:', data)
 
             // If the data is empty, reload the page to reset
             if (data.length === 0) {
@@ -221,6 +255,9 @@
 
             // Store the room id in the local storage
             localStorage.setItem(roomId, birthday)
+
+            // Store the room as mine
+            localStorage.setItem('owned', roomId)
 
             // Hide the birthday input
             document.querySelector('#birthday').style.display = 'none'
