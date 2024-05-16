@@ -43,6 +43,20 @@
             localStorage.setItem('user', user)
         }
 
+        // List of pages
+        const pages = ['room-selection', 'enter-birthday', 'results']
+
+        // Show page function (and hide all the others)
+        function showPage(page) {
+            pages.forEach(p => {
+                if (p === page) {
+                    document.querySelector(`#${p}`).style.display = 'block'
+                } else {
+                    document.querySelector(`#${p}`).style.display = 'none'
+                }
+            })
+        }
+
         // Handle when the user selects a room
         document.querySelector('#select-room').addEventListener('click', async () => {
             roomId = document.querySelector('#room').value
@@ -57,26 +71,22 @@
             // Check if we haven't already stored this birthday
             if (localStorage.getItem(roomId)) {
                 console.log('Birthday already stored')
-                document.querySelector('#room-selection').style.display = 'none'
-                document.querySelector('#results').style.display = 'block'
+                showPage('results')
                 return
             }
-            document.querySelector('#room-selection').style.display = 'none'
-            document.querySelector('#enter-birthday').style.display = 'block'
+            showPage('enter-birthday')
         })
 
         // Handle when the user creates a new room
         document.querySelector('#create-room').addEventListener('click', async () => {
-            document.querySelector('#room-selection').style.display = 'none'
-            document.querySelector('#enter-birthday').style.display = 'block'
+            showPage('enter-birthday')
         })
 
         // Handle when the user submits a birthday
         document.querySelector('#submit-birthday').addEventListener('click', async () => {
             const birthday = document.querySelector('#birthday').value
             await submitBirthday(birthday)
-            document.querySelector('#enter-birthday').style.display = 'none'
-            document.querySelector('#results').style.display = 'block'
+            showPage('results')
             getBirthdays()
         })
 
@@ -114,7 +124,7 @@
                 }, 3000)
                 return false
             }
-
+            
             if(previousResultCount === data.length) return
 
             // Show the room id
