@@ -32,6 +32,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraG52ZGZkY2NtbWFjcG9mY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU4NDA1OTEsImV4cCI6MjAzMTQxNjU5MX0.m89dtPlI3T-CZXtzHJ-SAC-D00G8KkFuNH_p-4H4lHA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         let roomId = null;
+        let previousResultCount = 0;
 
         // Check for uuid in local storage
         let user = localStorage.getItem('user')
@@ -50,7 +51,9 @@
             if (result === false) {
                 return
             }
-            
+
+            previousResultCount = 0
+
             // Check if we haven't already stored this birthday
             if (localStorage.getItem(roomId)) {
                 console.log('Birthday already stored')
@@ -82,7 +85,17 @@
             window.location.reload()
         })
 
+        // Every second, get the latest results
+        setInterval(() => {
+            getBirthdays()
+        }, 1000)
+
         async function getBirthdays() {
+
+            if(!roomId) return
+
+            // Show the room id
+            document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
 
             // Get all the birthdays in this room
             const {data, error} = await supabaseClient.from('birthdays').select().eq('room', roomId)
@@ -103,6 +116,10 @@
                 }, 3000)
                 return false
             }
+
+            if(previousResultCount === data.length) return
+
+            previousResultCount = data.length
 
             // See if there any duplicates
             let duplicates = data.reduce((acc, birthday) => {
@@ -147,6 +164,8 @@
                 roomId = crypto.randomUUID().slice(0, 6)
             }
 
+            previousResultCount = 0
+
             let data = { birthday: birthday, created_by: user, room: roomId}
 
             const { error } = await supabaseClient.from('birthdays').insert(data)
@@ -163,9 +182,6 @@
 
             // Hide the birthday input
             document.querySelector('#birthday').style.display = 'none'
-
-            // Show the room id
-            document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
         }
 
     </script>
