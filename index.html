@@ -94,9 +94,7 @@
 
             if(!roomId) return
 
-            // Show the room id
-            document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
-
+            
             // Get all the birthdays in this room
             const {data, error} = await supabaseClient.from('birthdays').select().eq('room', roomId)
 
@@ -119,6 +117,9 @@
 
             if(previousResultCount === data.length) return
 
+            // Show the room id
+            document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
+            
             previousResultCount = data.length
 
             // See if there any duplicates
