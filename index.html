@@ -42,6 +42,12 @@
             document.querySelector('#enter-birthday').style.display = 'block'
         })
 
+        // Handle when the user creates a new room
+        document.querySelector('#create-room').addEventListener('click', async () => {
+            document.querySelector('#room-selection').style.display = 'none'
+            document.querySelector('#enter-birthday').style.display = 'block'
+        })
+
         async function getBirthdays() {
 
             // Get all the birthdays in this room
