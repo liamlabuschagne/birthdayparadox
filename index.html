@@ -86,8 +86,8 @@
         document.querySelector('#select-room').addEventListener('click', async () => {
             selectRoom(document.querySelector('#room').value);
            
-            const result = await getBirthdays()
-            if (result === false) {
+            const exists = await getBirthdays()
+            if (!exists) {
                 return
             }
 
