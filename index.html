@@ -56,6 +56,11 @@
             // If we already have a room, show the results
             if (roomId) {
                 selectRoom(roomId) // Ensure the room id is displayed
+                // If we own the room, show the delete button
+                if(localStorage.getItem('owned') === roomId) {
+                    document.querySelector('#delete').style.display = 'inline'
+                }
+
                 showPage('results')
                 getBirthdays()
             }
@@ -165,6 +170,9 @@
             // Remove room ownership from local storage
             localStorage.removeItem('owned')
 
+            // Hide the delete button
+            document.querySelector('#delete').style.display = 'none'
+
             // Show the room selection page
             showPage('room-selection')
         }
@@ -258,6 +266,9 @@
 
             // Store the room as mine
             localStorage.setItem('owned', roomId)
+
+            // Show the delete button
+            document.querySelector('#delete').style.display = 'inline'
         }
 
     </script>
