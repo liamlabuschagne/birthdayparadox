@@ -17,6 +17,7 @@
     </div>
     <div id="enter-birthday" style="display: none;">
         <input type="date" name="birthday" id="birthday">
+        <button id="submit-birthday">Submit</button>
     </div>
     <div id="results" style="display: none;">
         <p id="room-id"></p>
@@ -46,6 +47,15 @@
         document.querySelector('#create-room').addEventListener('click', async () => {
             document.querySelector('#room-selection').style.display = 'none'
             document.querySelector('#enter-birthday').style.display = 'block'
+        })
+
+        // Handle when the user submits a birthday
+        document.querySelector('#submit-birthday').addEventListener('click', async () => {
+            const birthday = document.querySelector('#birthday').value
+            await submitBirthday(birthday)
+            document.querySelector('#enter-birthday').style.display = 'none'
+            document.querySelector('#results').style.display = 'block'
+            getBirthdays()
         })
 
         async function getBirthdays() {
@@ -104,9 +114,6 @@
 
             // Show the room id
             document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
-
-            // Get all birthdays
-            getBirthdays()
         }
 
     </script>
