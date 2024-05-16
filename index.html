@@ -8,16 +8,83 @@
 </head>
 <body>
     <h1>Birthday Paradox</h1>
-    <input type="date" name="birthday" id="birthday">
-
+    <div id="room-selection">
+        <p id="error" style="display: none;color:red">Room not found</p>
+        <input type="text" name="room" id="room" placeholder="Room ID">
+        <button id="select-room">Select</button>
+        <p>or</p>
+        <button id="create-room">Create new room</button>
+    </div>
+    <div id="enter-birthday" style="display: none;">
+        <input type="date" name="birthday" id="birthday">
+    </div>
+    <div id="results" style="display: none;">
+        <p id="room-id"></p>
+        <div id="birthdays"></div>
+    </div>
+    
     <script>
         // Initialize Supabase
         const SUPABASE_URL = 'https://skhnvdfdccmmacpofcla.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraG52ZGZkY2NtbWFjcG9mY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU4NDA1OTEsImV4cCI6MjAzMTQxNjU5MX0.m89dtPlI3T-CZXtzHJ-SAC-D00G8KkFuNH_p-4H4lHA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        let roomId = null;
+        const uuid = crypto.randomUUID();
+
+        // Handle when the user selects a room
+        document.querySelector('#select-room').addEventListener('click', async () => {
+            roomId = document.querySelector('#room').value
+            const result = await getBirthdays()
+            if (result === false) {
+                return
+            }
+            document.querySelector('#room-selection').style.display = 'none'
+            document.querySelector('#enter-birthday').style.display = 'block'
+        })
+
+        async function getBirthdays() {
+
+            // Get all the birthdays in this room
+            const {data, error} = await supabaseClient.from('birthdays').select().eq('room', roomId)
+
+            if (error) {
+                console.error('Error getting data:', error.message)
+                return
+            }
+
+            console.log('Data found:', data)
+
+            // If the data is empty, reload the page to reset
+            if (data.length === 0) {
+                // Show an error message
+                document.querySelector('#error').style.display = 'block'
+                setTimeout(() => {
+                    document.querySelector('#error').style.display = 'none'
+                }, 3000)
+                return false
+            }
+
+            // Display the birthdays in the DOM
+            const birthdays = data.map(birthday => {
+                // Convert to a human-readable date, removing the year
+                birthday.birthday = new Date(birthday.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+                return `<p>${birthday.birthday}</p>`
+            })
+
+            document.querySelector('#birthdays').innerHTML = birthdays.join('')
+        }
 
         async function submitBirthday(birthday) {
-            const { error } = await supabaseClient.from('birthdays').insert({ room: 123, birthday: birthday})
+
+            if(!roomId){
+                // Truncated uuid
+                roomId = uuid.slice(0, 6)
+            }
+
+            let data = { birthday: birthday, created_by: uuid, room: roomId}
+
+            const { error } = await supabaseClient.from('birthdays').insert(data)
 
             if (error) {
                 console.error('Error inserting data:', error.message)
@@ -25,12 +92,17 @@
             }
 
             console.log('Data inserted successfully')
+
+            // Hide the birthday input
+            document.querySelector('#birthday').style.display = 'none'
+
+            // Show the room id
+            document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
+
+            // Get all birthdays
+            getBirthdays()
         }
 
-        document.querySelector('#birthday').addEventListener('change', () => {
-            const birthday = document.querySelector('#birthday').value
-            submitBirthday(birthday)
-        })
     </script>
 </body>
 </html>
