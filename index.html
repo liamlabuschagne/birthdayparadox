@@ -80,10 +80,35 @@
                 return false
             }
 
+            // See if there any duplicates
+            let duplicates = data.reduce((acc, birthday) => {
+                if (acc[birthday.birthday]) {
+                    acc[birthday.birthday]++
+                } else {
+                    acc[birthday.birthday] = 1
+                }
+                return acc
+            }, {})
+
+            // Sort the birthdays by the number of duplicates
+            data.sort((a, b) => duplicates[b.birthday] - duplicates[a.birthday])
+
             // Display the birthdays in the DOM
             const birthdays = data.map(birthday => {
+
+                if(duplicates[birthday.birthday] === 0) return
+                
+                let count = duplicates[birthday.birthday];
+                
+                // Set the count to zero to indicate it has been printed
+                duplicates[birthday.birthday] = 0
+                
                 // Convert to a human-readable date, removing the year
                 birthday.birthday = new Date(birthday.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+
+                if (count > 1) {
+                    return `<p>${birthday.birthday} (${count} people)</p>`
+                }
 
                 return `<p>${birthday.birthday}</p>`
             })
