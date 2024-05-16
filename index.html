@@ -5,7 +5,7 @@
         const SUPABASE_URL = 'https://skhnvdfdccmmacpofcla.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraG52ZGZkY2NtbWFjcG9mY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU4NDA1OTEsImV4cCI6MjAzMTQxNjU5MX0.m89dtPlI3T-CZXtzHJ-SAC-D00G8KkFuNH_p-4H4lHA';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+alert("starting up")
         async function saveData() {
             const { data, error } = await supabase
                 .from('birthdays')
@@ -14,6 +14,7 @@
                 ]);
 
             if (error) {
+                    alert("nope "+error)
                 console.error('Error inserting data:', error);
             } else {
               alert("yay")
