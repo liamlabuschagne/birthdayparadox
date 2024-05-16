@@ -32,13 +32,30 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraG52ZGZkY2NtbWFjcG9mY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU4NDA1OTEsImV4cCI6MjAzMTQxNjU5MX0.m89dtPlI3T-CZXtzHJ-SAC-D00G8KkFuNH_p-4H4lHA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
         let roomId = null;
-        const uuid = crypto.randomUUID();
+
+        // Check for uuid in local storage
+        let user = localStorage.getItem('user')
+
+        // If the uuid is not found, create a new one
+        if (!user) {
+            user = crypto.randomUUID()
+            localStorage.setItem('user', user)
+        }
 
         // Handle when the user selects a room
         document.querySelector('#select-room').addEventListener('click', async () => {
             roomId = document.querySelector('#room').value
+           
             const result = await getBirthdays()
             if (result === false) {
+                return
+            }
+            
+            // Check if we haven't already stored this birthday
+            if (localStorage.getItem(roomId)) {
+                console.log('Birthday already stored')
+                document.querySelector('#room-selection').style.display = 'none'
+                document.querySelector('#results').style.display = 'block'
                 return
             }
             document.querySelector('#room-selection').style.display = 'none'
@@ -127,10 +144,10 @@
 
             if(!roomId){
                 // Truncated uuid
-                roomId = uuid.slice(0, 6)
+                roomId = crypto.randomUUID().slice(0, 6)
             }
 
-            let data = { birthday: birthday, created_by: uuid, room: roomId}
+            let data = { birthday: birthday, created_by: user, room: roomId}
 
             const { error } = await supabaseClient.from('birthdays').insert(data)
 
@@ -140,6 +157,9 @@
             }
 
             console.log('Data inserted successfully')
+
+            // Store the room id in the local storage
+            localStorage.setItem(roomId, birthday)
 
             // Hide the birthday input
             document.querySelector('#birthday').style.display = 'none'
