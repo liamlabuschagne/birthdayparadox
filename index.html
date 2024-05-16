@@ -5,6 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        /* Some styles to give colour, make buttons slightly rounded and sans font */
+        body {
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #333;
+            color: white;
+            padding: 1em;
+            margin: 0;
+        }
+
+        button {
+            padding: 0.5em 1em;
+            border: none;
+            background-color: #333;
+            color: white;
+            border-radius: 0.25em;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        input {
+            padding: 0.5em;
+            border: 1px solid #333;
+            border-radius: 0.25em;
+        }
+
+        #room-selection, #enter-birthday, #results {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 1em;
+            background-color: white;
+            border-radius: 0.25em;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 1em;
+        }
+    </style>
 </head>
 <body>
     <h1>Birthday Paradox</h1>
@@ -22,10 +68,9 @@
         <button id="submit-birthday">Submit</button>
     </div>
     <div id="results" style="display: none;">
-        <h2>Results</h2>
         <button class="home">Home</button>
-        <p id="room-id"></p>
-        <button id="delete">Delete Room</button>
+        <button id="delete" style="display: none;">Delete Room</button>
+        <h2 id="room-id"></h2>
         <div id="birthdays"></div>
     </div>
     
