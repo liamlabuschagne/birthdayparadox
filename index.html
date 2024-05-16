@@ -21,7 +21,7 @@
     </div>
     <div id="results" style="display: none;">
         <h2>Results</h2>
-        <button id="Home">Home</button>
+        <button id="home">Home</button>
         <p id="room-id"></p>
         <div id="birthdays"></div>
     </div>
@@ -31,25 +31,40 @@
         const SUPABASE_URL = 'https://skhnvdfdccmmacpofcla.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraG52ZGZkY2NtbWFjcG9mY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU4NDA1OTEsImV4cCI6MjAzMTQxNjU5MX0.m89dtPlI3T-CZXtzHJ-SAC-D00G8KkFuNH_p-4H4lHA';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-        let roomId = null;
-        let previousResultCount = 0;
-
-        // Check for uuid in local storage
         let user = localStorage.getItem('user')
-
-        // If the uuid is not found, create a new one
-        if (!user) {
-            user = crypto.randomUUID()
-            localStorage.setItem('user', user)
-        }
-
-        // List of pages
+        let roomId = localStorage.getItem('room');
+        let previousResultCount = 0;
         const pages = ['room-selection', 'enter-birthday', 'results']
+
+        function setup(){
+            // If the uuid is not found, create a new one
+            if (!user) {
+                user = crypto.randomUUID()
+                localStorage.setItem('user', user)
+            }
+            
+            // Maintain page persistance after refesh
+            if(localStorage.getItem('page')) {
+                showPage(localStorage.getItem('page'))
+            } else {
+                showPage('room-selection')
+            }
+
+            // If we already have a room, show the results
+            if (roomId) {
+                showPage('results')
+                getBirthdays()
+            }
+        }
+        setup()
 
         // Show page function (and hide all the others)
         function showPage(page) {
             pages.forEach(p => {
                 if (p === page) {
+                    // Store what page we are on in local storage
+                    localStorage.setItem('page', page)
+
                     document.querySelector(`#${p}`).style.display = 'block'
                 } else {
                     document.querySelector(`#${p}`).style.display = 'none'
@@ -57,9 +72,17 @@
             })
         }
 
+        function selectRoom(room){
+            // Store this in local storage
+            localStorage.setItem('room', room)
+
+            // Update the room id in the DOM
+            document.querySelector('#room-id').innerText = `Room ID: ${room}`
+        }
+
         // Handle when the user selects a room
         document.querySelector('#select-room').addEventListener('click', async () => {
-            roomId = document.querySelector('#room').value
+            selectRoom(document.querySelector('#room').value);
            
             const result = await getBirthdays()
             if (result === false) {
@@ -91,8 +114,11 @@
         })
 
         // Handle when the user clicks the home button
-        document.querySelector('#Home').addEventListener('click', () => {
-            window.location.reload()
+        document.querySelector('#home').addEventListener('click', () => {
+            // Leave the current room
+            localStorage.removeItem('room')
+
+            showPage('room-selection')
         })
 
         // Every second, get the latest results
@@ -126,9 +152,6 @@
             }
             
             if(previousResultCount === data.length) return
-
-            // Show the room id
-            document.querySelector('#room-id').innerText = `Room ID: ${roomId}`
             
             previousResultCount = data.length
 
@@ -173,6 +196,7 @@
             if(!roomId){
                 // Truncated uuid
                 roomId = crypto.randomUUID().slice(0, 6)
+                selectRoom(roomId)
             }
 
             previousResultCount = 0
