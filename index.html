@@ -1,28 +1,36 @@
-<h1>Birthday Paradox</h1>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Birthday Paradox</h1>
+    <input type="date" name="birthday" id="birthday">
+
+    <script>
         // Initialize Supabase
         const SUPABASE_URL = 'https://skhnvdfdccmmacpofcla.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraG52ZGZkY2NtbWFjcG9mY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU4NDA1OTEsImV4cCI6MjAzMTQxNjU5MX0.m89dtPlI3T-CZXtzHJ-SAC-D00G8KkFuNH_p-4H4lHA';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-alert("starting up")
-        async function saveData() {
-            const { data, error } = await supabase
-                .from('birthdays')
-                .insert([
-                    { room: '123', birthday: '15/07/2002' }
-                ]);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        async function submitBirthday(birthday) {
+            const { error } = await supabaseClient.from('birthdays').insert({ room: 123, birthday: birthday})
 
             if (error) {
-                    alert("nope "+error)
-                console.error('Error inserting data:', error);
-            } else {
-              alert("yay")
-                console.log('Data inserted successfully:', data);
+                console.error('Error inserting data:', error.message)
+                return
             }
+
+            console.log('Data inserted successfully')
         }
 
-        // Call the function to save data
-        saveData();
-    
-</script>
+        document.querySelector('#birthday').addEventListener('change', () => {
+            const birthday = document.querySelector('#birthday').value
+            submitBirthday(birthday)
+        })
+    </script>
+</body>
+</html>
