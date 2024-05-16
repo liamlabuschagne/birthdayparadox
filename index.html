@@ -20,6 +20,8 @@
         <button id="submit-birthday">Submit</button>
     </div>
     <div id="results" style="display: none;">
+        <h2>Results</h2>
+        <button id="Home">Home</button>
         <p id="room-id"></p>
         <div id="birthdays"></div>
     </div>
@@ -56,6 +58,11 @@
             document.querySelector('#enter-birthday').style.display = 'none'
             document.querySelector('#results').style.display = 'block'
             getBirthdays()
+        })
+
+        // Handle when the user clicks the home button
+        document.querySelector('#Home').addEventListener('click', () => {
+            window.location.reload()
         })
 
         async function getBirthdays() {
