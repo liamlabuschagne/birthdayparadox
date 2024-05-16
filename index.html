@@ -88,8 +88,8 @@
         document.querySelector('#select-room').addEventListener('click', async () => {
             selectRoom(document.querySelector('#room').value);
            
-            const exists = await getBirthdays()
-            if (!exists) {
+            const result = await getBirthdays()
+            if (result === false) {
                 // Delete the room from local storage
                 localStorage.removeItem('room')
                 roomId = null
