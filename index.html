@@ -75,6 +75,8 @@
         }
 
         function selectRoom(room){
+            roomId = room
+
             // Store this in local storage
             localStorage.setItem('room', room)
 
@@ -88,6 +90,9 @@
            
             const exists = await getBirthdays()
             if (!exists) {
+                // Delete the room from local storage
+                localStorage.removeItem('room')
+                roomId = null
                 return
             }
 
@@ -132,7 +137,6 @@
 
             if(!roomId) return
 
-            
             // Get all the birthdays in this room
             const {data, error} = await supabaseClient.from('birthdays').select().eq('room', roomId)
 
@@ -145,6 +149,7 @@
 
             // If the data is empty, reload the page to reset
             if (data.length === 0) {
+
                 // Show an error message
                 document.querySelector('#error').style.display = 'block'
                 setTimeout(() => {
