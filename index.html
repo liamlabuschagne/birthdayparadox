@@ -179,6 +179,9 @@
             // Get the JSON object of past visited rooms from local storage
             let rooms = JSON.parse(localStorage.getItem('rooms')) || []
 
+            // Check if this room is already in the list
+            if(rooms.includes(room)) return
+
             // Add this room to the list
             rooms.push(room)
 
