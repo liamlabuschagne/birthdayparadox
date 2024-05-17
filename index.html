@@ -277,13 +277,10 @@
             
             previousResultCount = data.length
 
-            // See if there any duplicates
-            let duplicates = data.reduce((acc, birthday) => {
-                if (acc[birthday.birthday]) {
-                    acc[birthday.birthday]++
-                } else {
-                    acc[birthday.birthday] = 1
-                }
+            // Disregarding the year, find any duplicates
+            const duplicates = data.reduce((acc, curr) => {
+                curr.birthday = new Date(curr.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                acc[curr.birthday] = acc[curr.birthday] ? acc[curr.birthday] + 1 : 1
                 return acc
             }, {})
 
@@ -300,9 +297,6 @@
                 // Set the count to zero to indicate it has been printed
                 duplicates[birthday.birthday] = 0
                 
-                // Convert to a human-readable date, removing the year
-                birthday.birthday = new Date(birthday.birthday).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-
                 if (count > 1) {
                     return `<p>${birthday.birthday} (${count} people)</p>`
                 }
