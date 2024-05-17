@@ -76,6 +76,8 @@
         <button id="select-room">Select</button>
         <p>or</p>
         <button id="create-room">Create new room</button>
+        <h2>Visited Rooms</h2>
+        <ul id="past-rooms"></ul>
     </div>
     <div id="enter-birthday" style="display: none;">
         <button class="home">Home</button>
@@ -138,6 +140,8 @@
                 getBirthdays()
             }
 
+            loadPastRooms()
+
             // Every second, get the latest results
             setInterval(() => {
                 getBirthdays()
@@ -167,6 +171,30 @@
 
             // Update the room id in the DOM
             document.querySelector('#room-id').innerText = `Room ID: ${room}`
+
+            saveRoom(room)
+        }
+
+        function saveRoom(room){
+            // Get the JSON object of past visited rooms from local storage
+            let rooms = JSON.parse(localStorage.getItem('rooms')) || []
+
+            // Add this room to the list
+            rooms.push(room)
+
+            // Show on home page
+            loadPastRooms()
+
+            // Store the updated list in local storage
+            localStorage.setItem('rooms', JSON.stringify(rooms))
+        }
+
+        function loadPastRooms(){
+            // Get the JSON object of past visited rooms from local storage
+            let rooms = JSON.parse(localStorage.getItem('rooms')) || []
+
+            // Add to list of visited rooms
+            document.querySelector('#past-rooms').innerHTML = rooms.map(r => `<li>${r}</li>`).join('')
         }
 
         // Handle when the user selects a room
@@ -212,6 +240,8 @@
 
             // Loose ownership of the room
             localStorage.removeItem('owned')
+
+            loadPastRooms()
 
             showPage('room-selection')
         }))
